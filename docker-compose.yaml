@@ -1,0 +1,56 @@
+services:
+  order_app:
+    build:
+      context: ./order_app/
+      no_cache: true
+    image: order_app
+    container_name: order_app
+    
+  db:
+    image: "postgres:16"
+    container_name: postgres
+    # Enable WAL logical replication at startup
+    command: postgres -c wal_level=logical
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_DB=cdc_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  debezium:
+    image: quay.io/debezium/server:2.5
+    container_name: debezium
+    healthcheck:
+      test: curl http://debezium:8080/q/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./debezium_conf:/debezium/conf:readonly
+
+  inventory_app:
+    build:
+      context: ./inventory_app/
+      no_cache: true
+    image: inventory_app
+    container_name: inventory_app
+    depends_on:
+      db:
+        condition: service_healthy
+      # debezium:
+      #   condition: service_healthy
+volumes:
+  postgres_data:
