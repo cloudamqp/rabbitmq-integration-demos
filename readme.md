@@ -5,4 +5,4 @@ technologies to solve practical use cases.
 
 # Currently Available in this Repo
 
-- RabbitMQ + Debezium + PostgreSQL
+- Change Data Capture: RabbitMQ + Debezium + PostgreSQL

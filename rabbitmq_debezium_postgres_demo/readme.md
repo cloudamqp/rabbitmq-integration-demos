@@ -16,6 +16,16 @@ Our demo will simulate an e-commerce platform's backend with two services:
 - Order management service
 
 At a very high level, this is what the flow of execution would look like:
+\
+\
+\
+![Alt text](assets/change-data-capture-3-final.svg)
+\
+\
+\
+
+In the illustration above:
+
 - Inventory service will connect to the PostgreSQL database and insert 
 a new product record every 5 secs.
 - Debezium server with a rabbitMQ streams sink connector will capture 
